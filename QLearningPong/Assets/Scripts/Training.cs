@@ -14,7 +14,6 @@ public class Training
     int LastBallPosX { get; set; }
     int LastBallPosY { get; set; }
     int LastPaddlePos { get; set; }
-    float RandomExploreProbability { get { return Mathf.Exp(-EpochCount / (PaddleController.PaddlePositionCount * BallController.XDivisions * BallController.YDivisions * 2f)); } }
     int EpochCount { get; set; }
     bool GameStateChanged
     {
@@ -65,9 +64,8 @@ public class Training
                 
 
             if(!PongStateWasUpdatedThisEpoch) //nothing happened this epoch
-            {
                 SetPongState(PongState.NoEvent);
-            }
+
             PongStateWasUpdatedThisEpoch = false;
                 
 
@@ -115,16 +113,17 @@ public class Training
 
     void UpdateReward()
     {
-        float maxExpectedReward = float.MinValue;
-        for (int i = 0; i < PaddleController.PaddlePositionCount; i++)
-            if (QTable[i, GameState.BallPositionX, GameState.BallPositionY] > maxExpectedReward)
-                maxExpectedReward = QTable[i, GameState.BallPositionX, GameState.BallPositionY];
-
-        float currentQValue = QTable[GameState.PaddlePosition, GameState.BallPositionX, GameState.BallPositionY];
+        var state = (GameState.PaddlePosition, GameState.BallPositionX, GameState.BallPositionY);
 
         //Bellman equation
-        float update = currentQValue + LearningRate * (GetCurrentReward() + DiscountRate * maxExpectedReward - currentQValue);
-        QTable[GameState.PaddlePosition, GameState.BallPositionX, GameState.BallPositionY] = update;          
+        float maxExpectedReward = float.MinValue;
+        for (int i = 0; i < PaddleController.PaddlePositionCount; i++)
+            if (QTable[i, state.Item2, state.Item3] > maxExpectedReward)
+                maxExpectedReward = QTable[i, state.Item2, state.Item3];
+
+        float currentQValue = QTable[state.Item1, state.Item2, state.Item3];
+        float update = currentQValue + LearningRate * (Rewards[CurrentPongState] + DiscountRate * maxExpectedReward - currentQValue);
+        QTable[state.Item1, state.Item2, state.Item3] = update;                 
     }
 
     float GetCurrentReward()
@@ -143,8 +142,8 @@ public class Training
 
 public class GameState
 {
-    const float MinX = -10;
-    const float MaxX = 9;
+    const float MinX = -1;
+    const float MaxX = 8;
     const float MinY = -5;
     const float MaxY = 5;
     const float MinPaddleY = -4;

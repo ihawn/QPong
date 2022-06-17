@@ -34,9 +34,20 @@ public class BallController : MonoBehaviour
                 Speed.y = -Speed.y;
                 break;
             case "Paddle":
-                Speed.x = -Random.Range(maxSpeed / 2, maxSpeed);
-                Speed.y = Random.Range(maxSpeed / 2, maxSpeed) * (Random.Range(0f, 1f) < 0.5f ? 1f : -1f);
-                gm.Training.SetPongState(PongState.PaddleHitBall);
+                var state = PongState.PaddleHitBall;
+                if(transform.position.x > gm.PaddleController.transform.position.x)
+                {
+                    state = PongState.PaddleMissedBall;
+                    transform.position = Vector3.zero;
+                    ResetVelocity();
+                }
+                else
+                {
+                    Speed.x = -Random.Range(maxSpeed / 2, maxSpeed);
+                    Speed.y = Random.Range(maxSpeed / 2, maxSpeed) * (Random.Range(0f, 1f) < 0.5f ? 1f : -1f);
+                }
+
+                gm.Training.SetPongState(state);
                 break;
         }
     }

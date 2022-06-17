@@ -35,7 +35,7 @@ public class PaddleController : MonoBehaviour
 
     void Update()
     {
-        transform.position = Vector3.Lerp(transform.position, TargetVector, MoveSpeed * Time.deltaTime);
+        transform.position = TargetVector;// Vector3.Lerp(transform.position, TargetVector, MoveSpeed * Time.deltaTime);
     }
 
     public void SetTargetPosition(float p)

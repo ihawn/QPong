@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
 
     public bool IsTraining;
     public int EpochCount;
+    public int QueueLength;
     public float DistanceReward;
 
     void Start()
